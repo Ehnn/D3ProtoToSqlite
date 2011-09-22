@@ -1,0 +1,3 @@
+generates CREATE TABLE transactions accordancing to .proto files
+
+Meant as a guideline, don't upload all the tables in every proto, and don't take all the fields being correct for granted.

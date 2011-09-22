@@ -101,10 +101,10 @@ namespace ProtoToSqlite
                 }
             }
 
-            createwriter.WriteLine(createSB.ToString());
-            createSB.Clear();
-            dropwriter.WriteLine(dropSB.ToString());
-            dropSB.Clear();
+            createwriter.WriteLine();
+            createwriter.WriteLine();
+            dropwriter.WriteLine();
+            dropwriter.WriteLine();
         }
 
         public static void ReadMessage(string tablename)
@@ -173,6 +173,11 @@ namespace ProtoToSqlite
 
             createSB.Remove(createSB.Length - 1, 1);
             createSB.Append(");");
+
+            createwriter.WriteLine(createSB.ToString());
+            createSB.Clear();
+            dropwriter.WriteLine(dropSB.ToString());
+            dropSB.Clear();
         }
     }
 }

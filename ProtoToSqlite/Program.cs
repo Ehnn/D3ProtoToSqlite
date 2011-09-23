@@ -14,6 +14,7 @@ namespace ProtoToSqlite
         static bool setPrimaries;
         static string package = "";
         static TextWriter createwriter, dropwriter;
+        static List<KeyValuePair<string, string>> extratables = new List<KeyValuePair<string, string>>();
 
         static void Main(string[] args)
         {
@@ -101,20 +102,23 @@ namespace ProtoToSqlite
                 }
             }
 
-            createwriter.WriteLine();
-            createwriter.WriteLine();
-            dropwriter.WriteLine();
-            dropwriter.WriteLine();
+            createwriter.Write(Environment.NewLine + Environment.NewLine);
+            dropwriter.Write(Environment.NewLine + Environment.NewLine);
         }
 
         public static void ReadMessage(string tablename)
         {
             int bracketcount = 0;
-            bool primary_set = !setPrimaries;
             string[] words;
 
-            createSB.Append("CREATE TABLE " + package.Replace(";", "").Replace(".", "") + tablename + " (");
-            dropSB.Append("DROP TABLE " + package.Replace(";", "").Replace(".", "") + tablename + ";");
+            string fulltablename = package.Replace(";", "").Replace(".", "") + tablename;
+
+            createSB.Append("CREATE TABLE " + fulltablename + " (");
+            dropSB.Append("DROP TABLE " + fulltablename + ";" + Environment.NewLine);
+
+            //create a row guid
+            if (setPrimaries)
+                createSB.Append("id UNSIGNED INTEGER PRIMARY KEY,");
 
             do
             {
@@ -132,19 +136,10 @@ namespace ProtoToSqlite
                             break;
                         case "required":
                         case "optional":
-                        //for now.. might have to make this an additional table later
-                        case "repeated":
                             switch (words[1])
                             {
                                 case "uint32":
-                                    //a bit of speculation here, the first unsigned int of the message is *probably* the key
-                                    if (primary_set)
-                                        createSB.Append(words[2] + " UNSIGNED INTEGER,");
-                                    else
-                                    {
-                                        createSB.Append(words[2] + " UNSIGNED INTEGER PRIMARY KEY,");
-                                        primary_set = true;
-                                    }
+                                    createSB.Append(words[2] + " UNSIGNED INTEGER,");
                                     break;
                                 case "int32":
                                 case "sint32":
@@ -158,26 +153,54 @@ namespace ProtoToSqlite
                                     break;
                             }
                             break;
-                        //simple int for now
-                        case "enum":
-                            //saved word in sqlite
-                            if (words[1].ToLower() == "flags")
-                                words[1] = "_flags";
-                            createSB.Append(words[1] + " INTEGER,");
+                        case "repeated":
+                            //create an additional table to contain the repeater
+                            createSB.Append(words[2] + " UNSIGNED INTEGER,");
+                            switch (words[1])
+                            {
+                                case "int32":
+                                case "sint32":
+                                    extratables.Add(new KeyValuePair<string, string>(fulltablename + "_" + words[2], "INTEGER"));
+                                    break;
+                                case "uint32":
+                                case "sfixed32":
+                                    extratables.Add(new KeyValuePair<string, string>(fulltablename + "_" + words[2], "UNSIGNED INTEGER"));
+                                    break;
+                                default:
+                                    //probably a reference that already has a table. we can link to its id
+                                    break;
+                            }
                             break;
+                        //not handling enums for now
+                        /*case "enum":
+                            //saved word in sqlite
+                            createSB.Append(words[1] + " INTEGER,");
+                            break;*/
                     }
                 }
 
 
             } while (bracketcount > 0);
 
-            createSB.Remove(createSB.Length - 1, 1);
-            createSB.Append(");");
 
-            createwriter.WriteLine(createSB.ToString());
+
+            createSB.Remove(createSB.Length - 1, 1);
+            createSB.Append(");" + Environment.NewLine);
+
+            foreach (var table in extratables)
+            {
+                createSB.Append("CREATE TABLE " + table.Key + " (id UNSIGNED INTEGER PRIMARY KEY, refid UNSIGNED INTEGER, value " + table.Value + ");" + Environment.NewLine);
+                dropSB.Append("DROP TABLE " + table.Key + ";" + Environment.NewLine);
+            }
+
+            extratables.Clear();
+
+            createwriter.Write(createSB.ToString());
             createSB.Clear();
-            dropwriter.WriteLine(dropSB.ToString());
+            dropwriter.Write(dropSB.ToString());
             dropSB.Clear();
         }
+
+
     }
 }

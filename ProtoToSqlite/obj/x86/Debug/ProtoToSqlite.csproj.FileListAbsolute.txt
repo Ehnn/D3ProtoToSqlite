@@ -1,0 +1,5 @@
+D:\d3sharp\D3ProtoToSqlite\ProtoToSqlite\bin\Debug\ProtoToSqlite.exe
+D:\d3sharp\D3ProtoToSqlite\ProtoToSqlite\bin\Debug\ProtoToSqlite.pdb
+D:\d3sharp\D3ProtoToSqlite\ProtoToSqlite\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\d3sharp\D3ProtoToSqlite\ProtoToSqlite\obj\x86\Debug\ProtoToSqlite.exe
+D:\d3sharp\D3ProtoToSqlite\ProtoToSqlite\obj\x86\Debug\ProtoToSqlite.pdb

@@ -1,0 +1,6 @@
+CREATE TABLE D3AccountBannerConfiguration (id UNSIGNED INTEGER PRIMARY KEY,banner_index UNSIGNED INTEGER,sigil_main INTEGER,sigil_accent INTEGER,pattern_color_index INTEGER,background_color_index INTEGER,sigil_color_index INTEGER,placement_index INTEGER,pattern INTEGER,use_sigil_variant INTEGER);
+CREATE TABLE D3AccountDigest (id UNSIGNED INTEGER PRIMARY KEY,version UNSIGNED INTEGER,last_played_hero_id UNSIGNED INTEGER,banner_configuration UNSIGNED INTEGER,flags UNSIGNED INTEGER);
+CREATE TABLE D3AccountSavedDefinition (id UNSIGNED INTEGER PRIMARY KEY,version UNSIGNED INTEGER,digest UNSIGNED INTEGER,saved_attributes UNSIGNED INTEGER,normal_shared_saved_items UNSIGNED INTEGER,hardcore_shared_saved_items UNSIGNED INTEGER,crafter_saved_data UNSIGNED INTEGER,seen_tutorials UNSIGNED INTEGER);
+CREATE TABLE D3AccountSavedDefinition_seen_tutorials (id UNSIGNED INTEGER PRIMARY KEY, refid UNSIGNED INTEGER, value UNSIGNED INTEGER);
+
+

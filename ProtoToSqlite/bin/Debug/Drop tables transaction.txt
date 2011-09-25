@@ -1,0 +1,6 @@
+DROP TABLE D3AccountBannerConfiguration;
+DROP TABLE D3AccountDigest;
+DROP TABLE D3AccountSavedDefinition;
+DROP TABLE D3AccountSavedDefinition_seen_tutorials;
+
+

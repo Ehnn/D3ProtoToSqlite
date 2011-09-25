@@ -118,7 +118,7 @@ namespace ProtoToSqlite
 
             //create a row guid
             if (setPrimaries)
-                createSB.Append("id UNSIGNED INTEGER PRIMARY KEY,");
+                createSB.Append("id GUID NOT NULL PRIMARY KEY,");
 
             do
             {
@@ -139,8 +139,6 @@ namespace ProtoToSqlite
                             switch (words[1])
                             {
                                 case "uint32":
-                                    createSB.Append(words[2] + " UNSIGNED INTEGER,");
-                                    break;
                                 case "int32":
                                 case "sint32":
                                 case "bool":
@@ -149,22 +147,20 @@ namespace ProtoToSqlite
                                     break;
                                 //speculation: if it's unrecognized, probably a reference, probably unsigned int
                                 default:
-                                    createSB.Append(words[2] + " UNSIGNED INTEGER,");
+                                    createSB.Append(words[2] + " GUID,");
                                     break;
                             }
                             break;
                         case "repeated":
                             //create an additional table to contain the repeater
-                            createSB.Append(words[2] + " UNSIGNED INTEGER,");
+                            createSB.Append(words[2] + " INTEGER,");
                             switch (words[1])
                             {
                                 case "int32":
                                 case "sint32":
-                                    extratables.Add(new KeyValuePair<string, string>(fulltablename + "_" + words[2], "INTEGER"));
-                                    break;
                                 case "uint32":
                                 case "sfixed32":
-                                    extratables.Add(new KeyValuePair<string, string>(fulltablename + "_" + words[2], "UNSIGNED INTEGER"));
+                                    extratables.Add(new KeyValuePair<string, string>(fulltablename + "_" + words[2], "INTEGER"));
                                     break;
                                 default:
                                     //probably a reference that already has a table. we can link to its id
@@ -189,7 +185,7 @@ namespace ProtoToSqlite
 
             foreach (var table in extratables)
             {
-                createSB.Append("CREATE TABLE " + table.Key + " (id UNSIGNED INTEGER PRIMARY KEY, refid UNSIGNED INTEGER, value " + table.Value + ");" + Environment.NewLine);
+                createSB.Append("CREATE TABLE " + table.Key + " (id GUID NOT NULL PRIMARY KEY, refid UNSIGNED INTEGER, value " + table.Value + ");" + Environment.NewLine);
                 dropSB.Append("DROP TABLE " + table.Key + ";" + Environment.NewLine);
             }
 
